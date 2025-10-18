@@ -11,8 +11,14 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Backend is running!');
+});
+
+app.get('/health', (req, res) => res.send('Backend is alive!'));
 
 app.post("/api/chatbot", async (req, res) => {
   const { question } = req.body;
@@ -49,5 +55,5 @@ app.post("/api/chatbot", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
