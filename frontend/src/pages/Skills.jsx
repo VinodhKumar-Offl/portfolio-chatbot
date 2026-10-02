@@ -98,7 +98,7 @@ const SkillSection = ({ title, skills }) => (
         {skills.map((skill, index) => (
           <motion.span
             key={index}
-            className={`cursor-default rounded-full border px-2.5 py-1 text-xs transition-all duration-200 ${
+            className={`skill-badge cursor-default rounded-full border px-2.5 py-1 text-xs transition-all duration-200 ${
               badgeColors[title] || "border-white/15 bg-white/[0.06] text-white"
             }`}
             whileHover={{ y: -2 }}

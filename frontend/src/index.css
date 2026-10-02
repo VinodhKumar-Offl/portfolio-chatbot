@@ -611,6 +611,95 @@ html[data-theme] body::before, html[data-theme] body::after { display: none; }
 .theme-light .chat-window .bg-red-500.text-white,
 .theme-light .chat-window .bg-black\/75 .text-white { color: #fff !important; }
 
+.theme-light #skills .skill-badge {
+  color: #25283a !important;
+  background: #f0edf8 !important;
+  border-color: #c8c1e3 !important;
+  font-weight: 600;
+}
+
+.welcome-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 2rem;
+  isolation: isolate;
+  background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--accent) 18%, var(--page)), var(--page) 68%);
+  color: var(--ink);
+  text-align: center;
+}
+
+.welcome-intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .25;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  mask-image: radial-gradient(circle at center, #000, transparent 72%);
+}
+
+.welcome-intro-orbit {
+  position: absolute;
+  z-index: -1;
+  width: min(86vw, 49rem);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--accent) 37%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 5rem color-mix(in srgb, var(--accent) 9%, transparent);
+  animation: welcome-orbit 18s linear infinite;
+}
+
+.welcome-intro-orbit-two {
+  width: min(110vw, 68rem);
+  border-color: color-mix(in srgb, var(--accent) 16%, transparent);
+  animation-direction: reverse;
+}
+
+.welcome-intro-orbit::after {
+  content: "";
+  position: absolute;
+  top: 12%;
+  left: 14%;
+  width: .6rem;
+  height: .6rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 1.5rem var(--accent);
+}
+
+.welcome-intro-content { position: relative; width: min(100%, 48rem); }
+.welcome-intro-portrait {
+  width: 6.75rem;
+  height: 6.75rem;
+  margin: 0 auto 1.7rem;
+  padding: .3rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  box-shadow: 0 0 3rem color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.welcome-intro-portrait img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 28%; }
+.welcome-intro-kicker { margin: 0 0 1rem; color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .25em; text-transform: uppercase; }
+.welcome-intro h2 { margin: 0; color: var(--ink); font-size: clamp(3rem, 10vw, 6.5rem); font-weight: 800; letter-spacing: -.075em; line-height: 1; }
+.welcome-intro h2 span { color: var(--accent); font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-weight: 400; }
+.welcome-intro-subtitle { margin: 1.5rem auto 2rem; color: var(--muted); font-size: clamp(.9rem, 2.5vw, 1.1rem); line-height: 1.6; }
+.welcome-intro-button { display: inline-flex; align-items: center; gap: .8rem; min-height: 3rem; padding: .7rem 1.2rem; border: 0; border-radius: 999px; background: var(--accent-solid); color: var(--accent-ink); font-size: .9rem; font-weight: 800; cursor: pointer; }
+.welcome-intro-button:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.welcome-intro-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.welcome-intro-progress { position: absolute; bottom: 0; left: 0; width: 100%; height: .2rem; transform-origin: left; background: var(--accent); animation: welcome-progress 4.2s linear forwards; }
+
+@keyframes welcome-orbit { to { transform: rotate(360deg); } }
+@keyframes welcome-progress { to { transform: scaleX(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-intro-orbit, .welcome-intro-progress { animation: none; }
+}
+
 @media (min-width: 768px) {
   .home-highlights { grid-template-columns: repeat(4, 1fr); }
   .home-focus-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

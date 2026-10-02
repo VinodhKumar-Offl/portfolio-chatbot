@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import WelcomeIntro from "./components/WelcomeIntro";
 
 import Home from "./pages/Home";
 
@@ -109,6 +110,7 @@ function App() {
 
       <Footer />
       <DeferredChatbot />
+      <WelcomeIntro />
     </div>
   );
 }

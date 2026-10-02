@@ -34,3 +34,12 @@ test('switches between light and dark themes and remembers the choice', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Switch to dark theme' }));
   expect(document.documentElement.dataset.theme).toBe('dark');
 });
+
+test('shows the welcome on every page load', () => {
+  const firstVisit = render(<App />);
+  expect(screen.getByRole('dialog', { name: /welcome to vinodh's portfolio/i })).toBeInTheDocument();
+
+  firstVisit.unmount();
+  render(<App />);
+  expect(screen.getByRole('dialog', { name: /welcome to vinodh's portfolio/i })).toBeInTheDocument();
+});

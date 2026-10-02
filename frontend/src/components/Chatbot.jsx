@@ -11,12 +11,10 @@ import {
 import profile from "../assets/profile.jpeg";
 
 const starterPrompts = [
-  "What has Vinodh built with AWS?",
-  "What did Vinodh build at Oracle?",
-  "Explain his Deloitte cloud security work",
-  "Tell me about his awards and achievements",
-  "Tell me about his Bedrock and RAG experience",
-  "Which certifications support his profile?",
+  "What has Vinodh built on AWS?",
+  "What is Vinodh building at Oracle?",
+  "How has Vinodh used AI and LLMs?",
+  "What is his cloud security experience?",
 ];
 
 const chatbotApiUrl = process.env.REACT_APP_CHATBOT_API_URL || "http://localhost:5001/api/chatbot";
@@ -117,7 +115,7 @@ const Chatbot = () => {
       setChat([
         {
           from: "bot",
-          text: "Hi, I am Vinodh's portfolio assistant. Ask me about his AWS cloud and Bedrock work, Oracle OCI validation, projects, certifications, or achievements.",
+          text: "Hi, I'm Vinodh's portfolio assistant. Explore his AWS work, Oracle projects, and applied AI experience.",
         },
       ]);
       setShowInput(true);
@@ -225,7 +223,7 @@ const Chatbot = () => {
     setChat([
       {
         from: "bot",
-        text: "Fresh thread started. Ask about AWS, Bedrock, Oracle, Deloitte, projects, certifications, awards, or career highlights.",
+        text: "Fresh conversation started. Ask about Vinodh's AWS work, Oracle projects, or AI experience.",
       },
     ]);
     setInput("");
