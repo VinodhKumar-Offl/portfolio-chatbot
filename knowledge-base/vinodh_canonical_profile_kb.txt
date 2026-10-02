@@ -1,0 +1,107 @@
+Vinodh Kumar R - canonical portfolio knowledge base
+
+Use this file as the authoritative source for Vinodh Kumar R's portfolio chatbot. If another source conflicts with this file, prefer this file.
+
+Identity and positioning
+Vinodh Kumar R is an AWS-focused Cloud and AI Engineer building practical cloud security automation, GenAI assistants, analytics systems, dashboards, and Python-based operational tools. AWS is his primary cloud platform; he also has OCI, GCP, and Azure experience.
+
+Current role
+Company: Oracle
+Role: Associate Advanced Services Engineer
+Location: Bengaluru, Karnataka
+Dates: May 2026 - Present
+Duration: Started in May 2026 and remains in the role. Calculate elapsed time from the current date if asked; do not repeat an outdated fixed duration.
+Summary: Vinodh fine-tunes Oracle SQL models and builds telemetry analytics and vulnerability assessment systems. His additional OCI work includes network validation.
+Key work:
+- Fine-tuned Qwen3-1.7B using LoRA/PEFT with a combined training and evaluation dataset of 5,000 Oracle SQL examples.
+- Merged and quantized the model to Ollama-compatible GGUF. Oracle syntax and estimated plan-cost checks found that 40% of evaluated rewrites had lower estimated plan cost than the originals.
+- Developed a Python telemetry analytics platform with parsers for AIX, Oracle Database, network, storage, and application telemetry, plus ingestion, forecasting, REST APIs, and risk-scored vulnerability recommendations.
+- Built a Python-based network validation tool to analyze OCI VCN flow logs against Microsegmentation NSG rules.
+- Enriched network flows with NSG and rule metadata and generated accepted/rejected compliance reports.
+- Implemented CIDR/IP, protocol, and port-range matching logic to validate traffic against security policies.
+- Automated large-scale file organization and telemetry processing workflows using Python utilities.
+
+Previous professional role
+Company: Deloitte
+Role: Analyst, Cyber - Enterprise Security
+Location: Bengaluru, Karnataka
+Dates: October 2024 - April 2026
+Duration: About 1 year and 6 months, or approximately 18 months.
+Important rule: If asked whether Vinodh has Deloitte experience, answer yes. Do not say he has no Deloitte experience.
+Summary: Vinodh worked on cloud security, security automation, Prisma Cloud policy migration, AWS Security Lake pipelines, GCP migration support, dashboards, and GenAI security assistants.
+Key work:
+- Built AWS Glue and Lambda pipelines to ingest AWS Config, Inspector, Prisma Cloud, and Qualys findings, normalize events to OCSF, and store them in Security Lake for Athena analytics.
+- Implemented RAG with Amazon Bedrock Knowledge Bases and OpenSearch vector search for enterprise knowledge retrieval.
+- Built a GCP security data pipeline using Pub/Sub, Cloud Functions, and BigQuery; supported Terraform deployments and configured VPCs, subnets, and Cloud NAT.
+- Automated Windows EC2 vulnerability remediation using AWS Systems Manager runbooks.
+- Debugged and executed the NVIDIA Morpheus lateral movement detection pipeline and resolved ControlMessage handling issues.
+- Extended threat alert summarization using Retrieval-Augmented Generation and optimized prompts for contextual threat detection.
+- Performed AquaSec-to-Prisma Cloud policy research, gap analysis, control translation, rule configuration, CIS alignment, and functional/regression testing.
+- Developed custom Bash checks to cover non-native Prisma Cloud policy requirements.
+- Built a ReactJS and Tailwind CSS cloud security dashboard backed by AWS Athena queries for asset, ITSM, and vulnerability visibility.
+- Automated Parquet conversion and AWS Security Lake ingestion using EventBridge and Lambda.
+- Configured ALB, ACM, Route 53, and Cognito for secure application delivery.
+- Supported Terraform-based cloud migration from AWS to GCP, configured GCP VPC networking, and automated Windows EC2 patching with AWS Systems Manager runbooks.
+- Built an AI-powered chatbot using Amazon Bedrock Knowledge Bases, RAG pipelines, foundation models, and Guardrails to answer asset, vulnerability, and ticket-related questions.
+
+Cloud security experience
+Vinodh's cloud security experience includes Prisma Cloud, AquaSec, AWS Security Lake, AWS Athena, AWS Lambda, EventBridge, Cognito, ALB, ACM, Route 53, Terraform, GCP networking, AWS Systems Manager, vulnerability visibility, policy migration, CIS alignment, runtime policy testing, and custom security checks.
+
+Generative AI experience
+Vinodh has built enterprise RAG systems using Amazon Bedrock Knowledge Bases and OpenSearch vector search. At Oracle, he fine-tuned Qwen3-1.7B with LoRA/PEFT for Oracle SQL rewriting. An earlier version of his portfolio chatbot used AWS Lex and Amazon Bedrock. The current portfolio assistant in this repository uses Gemini through LangChain with resume and profile context.
+
+Projects
+- Portfolio with Chatbot: An earlier version used AWS Lex and Amazon Bedrock. The current site uses React, an Express backend, Gemini through LangChain, and resume/profile context to answer portfolio questions. Enterprise Bedrock RAG at Deloitte is separate work.
+- Trash Classification: Built an AI-powered trash classification system using Flask, TensorFlow/Keras, OpenCV, NumPy, HTML, and CSS. Achieved 95 percent classification accuracy and reduced incorrect waste disposal by 30 percent.
+- Driver Drowsiness Detection: Built a driver drowsiness detection system using Python, OpenCV, dlib, NumPy, and machine learning classification/regression trees. Reported a 20 percent reduction in drowsy-driving incidents.
+- Face Recognition: Built a face recognition solution using Python, OpenCV, NumPy, dlib, face recognition libraries, and scikit-learn, including 68 facial landmarks.
+
+Internships
+- CodeWents, Software Developer Intern, June 2024 - July 2024: Built scalable software solutions using REST API and Python-Flask, documented with Sphinx, managed work with Jira, and used Git/GitHub.
+- Lets Grow More, Data Science Intern, February 2023 - March 2023: Built data science and computer vision projects including Iris classification, image-to-pencil sketch transformation, and stock market prediction.
+- Prime Solutions, Web Developer Intern, July 2022 - August 2022: Built responsive web pages using HTML, CSS, JavaScript, and MySQL.
+- Mr. Intelligence Inc, Software Developer Intern, December 2021 - January 2022: Built responsive Flutter user interfaces.
+
+Education
+Vinodh completed a Bachelor's Degree in Computer Science from SNS College of Technology with a CGPA of 9.37.
+
+Awards and achievements
+When answering about achievements, summarize in 4-6 lines. Group the answer into academics, awards, projects, certifications, and professional work. Do not list every internship or every certification unless specifically asked.
+Academic achievement: Bachelor's Degree in Computer Science from SNS College of Technology with CGPA 9.37.
+Awards: Leader of Today Award, All Rounder Performer Award, Mani Magan Award, and State III and District I in English Proficiency Test by Bharat Institutions.
+Project achievements: Trash Classification with 95 percent accuracy, Driver Drowsiness Detection with reported 20 percent incident reduction, the current Gemini portfolio assistant, and computer vision projects.
+Professional achievements: Oracle SQL fine-tuning, telemetry analytics, and OCI validation work; Deloitte AWS Glue/Lambda Security Lake pipelines, Prisma Cloud migration, GCP data pipelines, and Bedrock RAG work.
+Mentorship achievement: Delivered guest lectures and mentored 100+ students in programming, AI fundamentals, project building, GitHub usage, and portfolio development.
+
+Certifications on the current resume
+- AWS Certified Machine Learning Specialty
+- AWS Certified AI Practitioner
+- Oracle Cloud Infrastructure 2025 AI Foundations Associate
+- Snyk Certified Implementation Professional
+- Google Cloud Associate Cloud Engineer
+- Microsoft Certified: Azure Administrator Associate
+- Prisma Certified Cloud Security Engineer (PCCSE)
+
+Additional badges shown on the website
+- AWS Certified Cloud Practitioner
+- AWS Certified Machine Learning Engineer Associate
+- Google Cloud Digital Leader
+- IBM Enterprise Design Thinking Practitioner
+- HackerRank Java Gold Badge
+
+Teaching and mentorship
+Vinodh teaches programming, AI concepts, software engineering, and career/project guidance. He has delivered guest lectures including C Programming sessions at NGP Institute of Technology and has mentored 100+ students.
+
+Preferred chatbot answer style
+- Keep answers concise unless the user asks for detail.
+- For general cloud platform questions, lead with Vinodh's AWS work and certifications, then mention OCI, GCP, and Azure experience as relevant. Keep Oracle-specific work accurately identified as OCI work.
+- For general experience questions, focus first on professional experience: Oracle current role, Deloitte previous role, and internships. Mention projects and mentorship separately only as supporting experience.
+- For "tell about his experience", use this structure: current Oracle role, previous Deloitte role, internship foundation, and optional mentoring/teaching signal. Do not merge teaching into professional company experience.
+- For achievements, answer in 4-6 lines grouped by academics, awards, projects, certifications, and professional work.
+- When asked which certifications are on the resume, use only the "Certifications on the current resume" list. Identify additional website badges separately.
+- For Deloitte duration, answer: Vinodh worked at Deloitte from October 2024 to April 2026, about 1 year and 6 months, or approximately 18 months.
+- For Oracle duration, answer that Vinodh started in May 2026 as an Associate Advanced Services Engineer and remains in the role; calculate the duration from the current date when needed.
+- For questions asking total Oracle and Deloitte duration, Deloitte is about 1 year and 6 months; Oracle started in May 2026 and remains current.
+- For cloud security, connect Deloitte cloud security work with Oracle OCI validation and security analytics work.
+- For portfolio chatbot architecture, distinguish the earlier AWS Lex and Amazon Bedrock version from the current Gemini and LangChain version. Do not describe the current version as using Lex or Bedrock.
+- Do not invent experience that is not listed here.

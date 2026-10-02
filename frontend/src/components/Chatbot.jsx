@@ -1,4 +1,89 @@
 import { useEffect, useState, useRef } from "react";
+import {
+  FaCompressAlt,
+  FaEnvelope,
+  FaExpandAlt,
+  FaMinus,
+  FaPaperPlane,
+  FaRedo,
+  FaTimes,
+} from "react-icons/fa";
+import profile from "../assets/profile.jpeg";
+
+const starterPrompts = [
+  "What has Vinodh built with AWS?",
+  "What did Vinodh build at Oracle?",
+  "Explain his Deloitte cloud security work",
+  "Tell me about his awards and achievements",
+  "Tell me about his Bedrock and RAG experience",
+  "Which certifications support his profile?",
+];
+
+const renderInline = (text) =>
+  text.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
+    part.startsWith("**") && part.endsWith("**")
+      ? <strong key={index} className="font-semibold text-cyan-100">{part.slice(2, -2)}</strong>
+      : part
+  );
+
+const ChatMessageText = ({ text }) => {
+  const lines = String(text)
+    .replace(/([^\n])\s+\*\s+(?=\*\*)/g, "$1\n* ")
+    .split(/\n/);
+  const blocks = [];
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    const bullet = trimmed.match(/^[-*]\s+(.+)$/);
+    const numbered = trimmed.match(/^\d+[.)]\s+(.+)$/);
+    const heading = trimmed.match(/^#{1,3}\s+(.+)$/);
+    const type = bullet ? "ul" : numbered ? "ol" : heading ? "heading" : "paragraph";
+    const content = bullet?.[1] || numbered?.[1] || heading?.[1] || trimmed;
+    const previous = blocks[blocks.length - 1];
+
+    if ((type === "ul" || type === "ol") && previous?.type === type) {
+      previous.items.push(content);
+    } else {
+      blocks.push(type === "ul" || type === "ol"
+        ? { type, items: [content] }
+        : { type, content });
+    }
+  });
+
+  return (
+    <div className="min-w-0 space-y-3 break-words text-sm leading-relaxed sm:text-[15px]">
+      {blocks.map((block, index) => {
+        if (block.type === "ul" || block.type === "ol") {
+          const List = block.type;
+          return (
+            <List key={index} className={`space-y-2 pl-5 ${block.type === "ul" ? "list-disc" : "list-decimal"}`}>
+              {block.items.map((item, itemIndex) => <li key={itemIndex} className="pl-1">{renderInline(item)}</li>)}
+            </List>
+          );
+        }
+        if (block.type === "heading") {
+          return <h3 key={index} className="font-bold text-white">{renderInline(block.content)}</h3>;
+        }
+        return <p key={index}>{renderInline(block.content)}</p>;
+      })}
+    </div>
+  );
+};
+
+const getChatSessionId = () => {
+  const key = "vinodh-chat-session-id";
+  const existingSessionId = window.sessionStorage.getItem(key);
+  if (existingSessionId) return existingSessionId;
+
+  const newSessionId =
+    window.crypto?.randomUUID?.() ||
+    `portfolio-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  window.sessionStorage.setItem(key, newSessionId);
+  return newSessionId;
+};
 
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
@@ -15,13 +100,13 @@ const Chatbot = () => {
 
   useEffect(() => {
     const notificationTimer = setTimeout(() => setShowInitialNotification(true), 2000);
-    const openTimer = setTimeout(() => {
+    const notificationDismissTimer = setTimeout(() => {
       setShowInitialNotification(false);
-      setOpen(true);
-    }, 3500);
+    }, 6500);
+
     return () => {
       clearTimeout(notificationTimer);
-      clearTimeout(openTimer);
+      clearTimeout(notificationDismissTimer);
     };
   }, []);
 
@@ -30,7 +115,7 @@ const Chatbot = () => {
       setChat([
         {
           from: "bot",
-          text: "👋 Hi there! I'm Vinodh's assistant. You can ask about my experience, projects, or certifications!",
+          text: "Hi, I am Vinodh's portfolio assistant. Ask me about his AWS cloud and Bedrock work, Oracle OCI validation, projects, certifications, or achievements.",
         },
       ]);
       setShowInput(true);
@@ -106,10 +191,10 @@ const Chatbot = () => {
     setHasNewReply(false);
 
     try {
-      const response = await fetch("http://localhost:5000/api/chatbot", {
+      const response = await fetch("http://localhost:5001/api/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, sessionId: getChatSessionId() }),
       });
 
       if (!response.ok) throw new Error("Server error");
@@ -127,7 +212,7 @@ const Chatbot = () => {
       console.error("Chatbot API error:", error);
       setChat((prev) => [
         ...prev,
-        { from: "bot", text: "⚠️ Something went wrong connecting to the assistant." },
+        { from: "bot", text: "I could not reach the assistant service right now. Please try again in a moment or contact Vinodh directly." },
       ]);
     } finally {
       setLoading(false);
@@ -135,7 +220,12 @@ const Chatbot = () => {
   };
 
   const handleClear = () => {
-    setChat([{ from: "bot", text: "👋 How can I assist you about Vinodh?" }]);
+    setChat([
+      {
+        from: "bot",
+        text: "Fresh thread started. Ask about AWS, Bedrock, Oracle, Deloitte, projects, certifications, awards, or career highlights.",
+      },
+    ]);
     setInput("");
     setShowInput(true);
     setShowCloseConfirm(false);
@@ -151,121 +241,180 @@ const Chatbot = () => {
   return (
     <>
       {showInitialNotification && (
-        <div className="fixed bottom-28 right-6 bg-gradient-to-r from-cyan-500/80 to-indigo-500/80 text-white rounded-lg px-4 py-2 shadow-lg z-60 animate-fade-in-up">
-          Chatbot opening soon...
+        <div className="fixed bottom-28 right-4 sm:right-6 rounded-2xl border border-cyan-300/25 bg-slate-950/90 px-4 py-3 text-sm font-semibold text-cyan-100 shadow-[0_18px_60px_rgba(8,145,178,0.28)] backdrop-blur-xl z-60 animate-fade-in-up">
+          Portfolio assistant is ready.
         </div>
       )}
 
       {showMinimizeNotification && (
-        <div className="fixed bottom-28 right-6 bg-gradient-to-r from-cyan-500/80 to-indigo-500/80 text-white rounded-lg px-4 py-2 shadow-lg z-60 animate-fade-in-up">
-          Chat minimized! Click 💬 to continue.
+        <div className="fixed bottom-28 right-4 sm:right-6 rounded-2xl border border-cyan-300/25 bg-slate-950/90 px-4 py-3 text-sm font-semibold text-cyan-100 shadow-[0_18px_60px_rgba(8,145,178,0.28)] backdrop-blur-xl z-60 animate-fade-in-up">
+          Assistant minimized. Open it to continue.
         </div>
       )}
 
       {hasNewReply && windowState === "minimized" && (
-        <div className="fixed bottom-36 right-6 bg-gradient-to-r from-green-500/80 to-blue-600/80 text-white rounded-lg px-4 py-2 shadow-lg z-60 animate-fade-in-up">
-          1 new reply received. Click 💬 to view.
+        <div className="fixed bottom-36 right-4 sm:right-6 rounded-2xl border border-emerald-300/25 bg-slate-950/90 px-4 py-3 text-sm font-semibold text-emerald-100 shadow-[0_18px_60px_rgba(16,185,129,0.22)] backdrop-blur-xl z-60 animate-fade-in-up">
+          New assistant reply available.
         </div>
       )}
 
       <button
         onClick={open ? requestCloseChat : openChat}
-        className={`fixed bottom-6 right-6 text-white rounded-full w-16 h-16 shadow-xl flex items-center justify-center text-2xl z-50 transition-transform duration-300 ease-out
-          ${hasNewReply ? "animate-bounce ring-2 ring-cyan-400" : "bg-gradient-to-br from-cyan-400 to-indigo-600"}
+        className={`chat-launcher fixed bottom-5 right-4 sm:bottom-6 sm:right-6 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-cyan-200/40 bg-slate-950 z-50 transition-transform duration-300 ease-out hover:-translate-y-1
+          ${hasNewReply ? "animate-bounce ring-2 ring-emerald-100" : ""}
         `}
         aria-label="Toggle Chatbot"
       >
-        💬
+        <img
+          src={profile}
+          alt="Vinodh Portfolio Assistant"
+          className="h-full w-full object-cover object-center"
+          loading="lazy"
+          decoding="async"
+        />
+        <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-cyan-300/5" />
         {hasNewReply && (
-          <span className="absolute top-1 right-1 bg-red-600 w-3.5 h-3.5 rounded-full border-2 border-white" />
+          <span className="absolute right-1 top-1 h-3.5 w-3.5 rounded-full border-2 border-slate-950 bg-red-500" />
         )}
       </button>
 
       {open && (
         <div
-          className={`fixed bg-gradient-to-br from-gray-900/60 to-gray-800/60 backdrop-blur-2xl text-white shadow-2xl border border-white/20 transition-all duration-500 ease-in-out flex flex-col z-50 animate-fade-in-slide-up
+          className={`chat-window fixed flex flex-col overflow-hidden border border-cyan-300/20 bg-slate-950/90 text-white backdrop-blur-2xl transition-all duration-500 ease-in-out z-50 animate-fade-in-slide-up
             ${windowState === "minimized"
-              ? "bottom-24 right-6 w-[320px] h-[64px] rounded-2xl"
+              ? "bottom-24 right-4 h-[64px] w-[calc(100vw-2rem)] rounded-2xl sm:right-6 sm:w-[340px]"
               : windowState === "maximized"
-              ? "inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)] rounded-2xl"
-              : "bottom-24 right-6 w-[400px] h-[600px] rounded-2xl"
+              ? "inset-3 h-[calc(100%-1.5rem)] w-[calc(100%-1.5rem)] rounded-2xl sm:inset-4 sm:h-[calc(100%-2rem)] sm:w-[calc(100%-2rem)]"
+              : "bottom-24 right-3 h-[min(620px,calc(100vh-7rem))] w-[calc(100vw-1.5rem)] rounded-2xl sm:right-6 sm:w-[420px]"
             }`}
         >
-          <div className="p-4 border-b border-white/10 flex justify-between items-center font-semibold text-lg bg-gradient-to-r from-cyan-900/50 to-indigo-900/50 backdrop-blur-md rounded-t-2xl">
-            Chat with Vinodh
-            <div className="flex gap-3">
+          <div className="chat-header flex items-center justify-between border-b border-white/10 p-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="relative flex h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-cyan-300/30 bg-slate-950 shadow-[0_12px_32px_rgba(34,211,238,0.22)]">
+                <img
+                  src={profile}
+                  alt="Vinodh Portfolio Assistant"
+                  className="h-full w-full object-cover object-center"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-base font-black text-white">Vinodh Portfolio Assistant</p>
+                <p className="truncate text-xs text-cyan-100/80">Cloud / AI / Projects</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 gap-2">
               <button
                 onClick={toggleWindowState}
-                className="text-gray-200 hover:text-white transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm text-gray-200 transition-colors hover:border-cyan-300/50 hover:text-white"
                 aria-label="Toggle Size"
                 disabled={showCloseConfirm}
               >
-                {windowState === "maximized" ? "🗕" : windowState === "minimized" ? "🗖" : "🗖"}
+                {windowState === "maximized" ? <FaCompressAlt /> : windowState === "minimized" ? <FaExpandAlt /> : <FaMinus />}
               </button>
               <button
                 onClick={requestCloseChat}
-                className="text-gray-200 hover:text-white transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm text-gray-200 transition-colors hover:border-red-300/50 hover:text-white"
                 aria-label="Close Chat"
                 disabled={showCloseConfirm}
               >
-                ✕
+                <FaTimes />
               </button>
             </div>
           </div>
 
           {windowState !== "minimized" && (
-            <div className="p-4 border-b border-white/10">
+            <div className="border-b border-white/10 p-4">
               <button
                 onClick={() => window.open("mailto:vinodhkumar142002@gmail.com")}
-                className="max-w-xs mx-auto w-full bg-gradient-to-r from-cyan-500 to-indigo-500 hover:scale-105 hover:brightness-125 rounded-lg px-6 py-2.5 text-center font-semibold text-white shadow-md transition-all duration-200"
+                className="mx-auto flex w-full max-w-xs items-center justify-center gap-2 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-5 py-2.5 text-center text-sm font-bold text-emerald-100 shadow-md transition-all duration-200 hover:border-emerald-200/60 hover:bg-emerald-300/15"
               >
-                Hire Me
+                <FaEnvelope />
+                Contact Vinodh
               </button>
             </div>
           )}
 
           {windowState !== "minimized" && (
-            <div className={`flex-1 p-5 space-y-4 custom-scrollbar relative ${showCloseConfirm ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+            <div className={`custom-scrollbar relative flex-1 space-y-4 p-4 sm:p-5 ${showCloseConfirm ? 'overflow-hidden' : 'overflow-y-auto'}`}>
               {chat.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`p-4 rounded-xl shadow-lg backdrop-blur-sm border border-white/10 animate-fade-in-up ${msg.from === "user"
-                    ? "bg-gradient-to-r from-cyan-500/60 to-indigo-500/60 text-white self-end ml-auto max-w-[80%]"
-                    : "bg-gradient-to-r from-gray-700/60 to-gray-600/60 text-white self-start mr-auto max-w-[80%]"
-                    }`}
+                  className={`animate-fade-in-up flex gap-3 ${msg.from === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <p className="text-base leading-relaxed">{msg.text}</p>
+                  {msg.from === "bot" && (
+                    <img
+                      src={profile}
+                      alt="Vinodh Portfolio Assistant"
+                      className="mt-1 h-9 w-9 shrink-0 rounded-full border border-cyan-300/25 object-cover object-center"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                  <div
+                    className={`rounded-2xl border p-4 shadow-lg backdrop-blur-sm ${msg.from === "user"
+                      ? "max-w-[86%] border-cyan-200/25 bg-cyan-300/15 text-cyan-50"
+                      : "min-w-0 max-w-[calc(100%-3rem)] border-white/10 bg-white/[0.06] text-slate-100"
+                      }`}
+                  >
+                    {msg.from === "bot" ? <ChatMessageText text={msg.text} /> : <p className="break-words text-sm leading-relaxed sm:text-[15px]">{msg.text}</p>}
+                  </div>
                 </div>
               ))}
 
+              {chat.length === 1 && !loading && (
+                <div className="grid gap-2">
+                  {starterPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => sendQuestion(prompt)}
+                      className="rounded-2xl border border-cyan-300/15 bg-cyan-300/5 px-4 py-3 text-left text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/45 hover:bg-cyan-300/10"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {loading && (
-                <div className="text-sm text-center text-gray-200 animate-pulse">Typing...</div>
+                <div className="mr-auto flex w-fit items-center gap-3 rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-sm text-gray-200 animate-pulse">
+                  <img
+                    src={profile}
+                    alt="Vinodh Portfolio Assistant"
+                    className="h-8 w-8 rounded-full border border-cyan-300/25 object-cover object-center"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span>Reading portfolio context...</span>
+                </div>
               )}
 
               {showCloseConfirm && (
                 <div
                   ref={modalRef}
                   tabIndex={-1}
-                  className="absolute inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center rounded-2xl p-6 z-50"
+                  className="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-2xl bg-black/75 p-6 backdrop-blur-md"
                   role="dialog"
                   aria-modal="true"
                   aria-labelledby="confirm-close-title"
                 >
                   <p id="confirm-close-title" className="mb-5 text-center text-lg font-semibold text-white">
-                    Are you sure you want to close the chat? <br />
-                    Your questions and answers will be lost.
+                    Close this assistant thread? <br />
+                    Your questions and answers will be cleared.
                   </p>
                   <div className="flex gap-4">
                     <button
                       onClick={confirmClose}
-                      className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-700 rounded-lg hover:brightness-125 font-semibold text-white shadow-md transition-all duration-200"
+                      className="rounded-full bg-red-500 px-5 py-2.5 font-semibold text-white shadow-md transition-all duration-200 hover:bg-red-400"
                       autoFocus
                     >
-                      Yes, Close
+                      Close
                     </button>
                     <button
                       onClick={cancelClose}
-                      className="px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg hover:brightness-125 font-semibold text-white shadow-md transition-all duration-200"
+                      className="rounded-full border border-white/15 bg-white/10 px-5 py-2.5 font-semibold text-white shadow-md transition-all duration-200 hover:bg-white/15"
                     >
                       Cancel
                     </button>
@@ -276,11 +425,11 @@ const Chatbot = () => {
           )}
 
           {windowState !== "minimized" && showInput && !showCloseConfirm && (
-            <div className="p-4 border-t border-white/10 flex gap-3 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-md">
+            <div className="flex gap-3 border-t border-white/10 bg-slate-950/80 p-3 sm:p-4 backdrop-blur-md">
               <input
                 type="text"
-                className="flex-1 rounded-lg px-4 py-2.5 bg-gray-800/50 text-white outline-none placeholder:text-gray-300 border border-white/20 backdrop-blur-sm focus:ring-2 focus:ring-cyan-400 transition-all duration-200"
-                placeholder="Ask me anything about Vinodh..."
+                className="min-w-0 flex-1 rounded-full border border-white/15 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none backdrop-blur-sm transition-all duration-200 placeholder:text-gray-400 focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-300/20"
+                placeholder="Ask about Vinodh's work..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -289,18 +438,20 @@ const Chatbot = () => {
               />
               <button
                 onClick={() => sendQuestion(input)}
-                className="bg-gradient-to-br from-cyan-500 to-indigo-500 px-5 py-2.5 rounded-lg hover:brightness-125 hover:scale-105 disabled:opacity-50 text-white font-semibold shadow-md transition-all duration-200"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan-300 text-slate-950 shadow-[0_12px_32px_rgba(34,211,238,0.18)] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45"
                 disabled={loading || !input.trim()}
+                aria-label="Send message"
               >
-                Send
+                <FaPaperPlane />
               </button>
             </div>
           )}
 
           {windowState !== "minimized" && !showCloseConfirm && (
-            <div className="flex justify-between px-4 py-2 text-sm border-t border-white/10 bg-gradient-to-r from-gray-900/50 to-gray-800/50 text-gray-200 rounded-b-2xl">
-              <button onClick={handleClear} className="hover:text-white transition-colors">
-                🧹 Clear
+            <div className="flex justify-between border-t border-white/10 bg-slate-950/80 px-4 py-2 text-sm text-gray-300">
+              <button onClick={handleClear} className="inline-flex items-center gap-2 transition-colors hover:text-white">
+                <FaRedo className="text-xs text-cyan-300" />
+                Clear thread
               </button>
             </div>
           )}

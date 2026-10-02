@@ -8,6 +8,7 @@ import {
   FaInstagram,
   FaEnvelope,
   FaPhone,
+  FaPaperPlane,
 } from "react-icons/fa";
 import { SiLeetcode, SiX } from "react-icons/si";
 
@@ -51,6 +52,7 @@ const Contact = () => {
     message: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [responseMsg, setResponseMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -58,50 +60,70 @@ const Contact = () => {
     "https://script.google.com/macros/s/AKfycbxb_mTZZAgmt2w8qkgLrsMAmGwVQg8C1t1CVVHU_XKiNjwLVLwp5M4hXmWBrus1y1G9/exec";
 
   const isGibberish = (text) => {
-    const vowelCount = (text.match(/[aeiou]/gi) || []).length;
-    const consonantCluster = /[^aeiou\s]{5,}/i;
+    const normalized = text.trim().toLowerCase();
+    const letters = normalized.match(/[a-z]/g) || [];
+    const vowelCount = normalized.match(/[aeiou]/g)?.length || 0;
+    const consonantCluster = /[bcdfghjklmnpqrstvwxyz]{7,}/i;
     const repeatedChars = /(.)\1{3,}/;
-    const words = text.trim().split(/\s+/);
-    const dictionaryWords = words.filter(
-      (word) =>
-        word.length > 2 &&
-        /^[a-z]+$/i.test(word) &&
-        !consonantCluster.test(word)
-    );
+    const hasReadableWord = normalized
+      .split(/\s+/)
+      .some((word) => /[a-z]{2,}/.test(word) && !consonantCluster.test(word));
 
     return (
-      vowelCount < 5 ||
-      consonantCluster.test(text) ||
-      repeatedChars.test(text) ||
-      dictionaryWords.length < 3
+      letters.length < 4 ||
+      vowelCount === 0 ||
+      repeatedChars.test(normalized) ||
+      consonantCluster.test(normalized) ||
+      !hasReadableWord
     );
+  };
+
+  const inputClass = (field) =>
+    `w-full rounded-2xl border bg-white/[0.06] p-3 text-white outline-none transition placeholder:text-slate-400 focus:ring-2 ${
+      errors[field]
+        ? "border-red-300/80 ring-2 ring-red-300/20 focus:border-red-300 focus:ring-red-300/30"
+        : "border-white/10 focus:border-cyan-300/60 focus:ring-cyan-300/20"
+    }`;
+
+  const handleFieldChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+    if (responseMsg && responseMsg !== "Message sent successfully.") {
+      setResponseMsg("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nextErrors = {};
 
     if (formData.name.trim().length < 2) {
-      setResponseMsg("❌ Name must be at least 2 characters.");
-      return;
+      nextErrors.name = "Name must be at least 2 characters.";
+    } else if (isGibberish(formData.name)) {
+      nextErrors.name = "Please enter a meaningful name.";
     }
 
     if (!emailRegex.test(formData.email) || formData.email.length < 6) {
-      setResponseMsg("❌ Enter a valid email address.");
-      return;
+      nextErrors.email = "Enter a valid email address.";
     }
 
     if (formData.message.trim().length < 10) {
-      setResponseMsg("❌ Message must be at least 10 characters.");
+      nextErrors.message = "Message must be at least 10 characters.";
+    } else if (isGibberish(formData.message)) {
+      nextErrors.message = "Please enter a meaningful message.";
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      setResponseMsg("Please fix the highlighted fields.");
       return;
     }
 
-    if (isGibberish(formData.message)) {
-      setResponseMsg("❌ Please enter a meaningful message.");
-      return;
-    }
-
+    setErrors({});
     const form = new FormData();
     form.append("name", formData.name);
     form.append("email", formData.email);
@@ -113,10 +135,11 @@ const Contact = () => {
         method: "POST",
         body: form,
       });
-      setResponseMsg("✅ Message sent successfully!");
+      setResponseMsg("Message sent successfully.");
       setFormData({ name: "", email: "", message: "" });
+      setErrors({});
     } catch (error) {
-      setResponseMsg("❌ Something went wrong. Please try again.");
+      setResponseMsg("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
       setTimeout(() => setResponseMsg(""), 5000);
@@ -124,15 +147,20 @@ const Contact = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16 text-white">
+    <section className="portfolio-section pb-24 sm:pb-28">
       <motion.h2
-        className="text-4xl font-extrabold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600"
+        className="mb-3 text-center text-3xl font-extrabold text-white sm:text-4xl"
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        Let’s Connect
+        Start a project conversation
       </motion.h2>
+      <p className="mx-auto mb-8 max-w-2xl text-center text-sm leading-relaxed text-slate-400 sm:mb-10 sm:text-base">
+        Share the problem, role, or project you have in mind. I am best suited for
+        AWS cloud automation, Bedrock assistants, security data pipelines,
+        dashboards, and Python utilities.
+      </p>
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -140,45 +168,54 @@ const Contact = () => {
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
       >
-        <GlassCard className="bg-gradient-to-br from-cyan-800/20 to-cyan-500/10 backdrop-blur-lg">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <motion.input
-              type="text"
-              placeholder="Your name"
-              className="w-full p-3 bg-white/10 rounded-lg text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-cyan-400"
-              value={formData.name}
-              required
-              whileFocus={{ scale: 1.02 }}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-            <motion.input
-              type="email"
-              placeholder="Your email"
-              className="w-full p-3 bg-white/10 rounded-lg text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-cyan-400"
-              value={formData.email}
-              required
-              whileFocus={{ scale: 1.02 }}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-            <motion.textarea
-              placeholder="Your message"
-              rows="5"
-              className="w-full p-3 bg-white/10 rounded-lg text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-cyan-400"
-              value={formData.message}
-              whileFocus={{ scale: 1.02 }}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
-            ></motion.textarea>
+        <GlassCard className="max-w-none border border-cyan-300/15 bg-slate-950/70 backdrop-blur-lg">
+          <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <motion.input
+                type="text"
+                placeholder="Your name"
+                className={inputClass("name")}
+                value={formData.name}
+                required
+                aria-invalid={Boolean(errors.name)}
+                onChange={(e) => handleFieldChange("name", e.target.value)}
+              />
+              {errors.name && (
+                <p className="mt-2 text-sm font-medium text-red-300">{errors.name}</p>
+              )}
+            </div>
+            <div>
+              <motion.input
+                type="email"
+                placeholder="Your email"
+                className={inputClass("email")}
+                value={formData.email}
+                required
+                aria-invalid={Boolean(errors.email)}
+                onChange={(e) => handleFieldChange("email", e.target.value)}
+              />
+              {errors.email && (
+                <p className="mt-2 text-sm font-medium text-red-300">{errors.email}</p>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <motion.textarea
+                placeholder="Tell me about the project, role, or problem"
+                rows="5"
+                className={inputClass("message")}
+                value={formData.message}
+                aria-invalid={Boolean(errors.message)}
+                onChange={(e) => handleFieldChange("message", e.target.value)}
+              ></motion.textarea>
+              {errors.message && (
+                <p className="mt-2 text-sm font-medium text-red-300">{errors.message}</p>
+              )}
+            </div>
 
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition flex items-center justify-center gap-2"
+              className="flex items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 font-bold text-slate-950 shadow-[0_18px_40px_rgba(34,211,238,0.18)] transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit"
               disabled={loading}
             >
               {loading ? (
@@ -206,16 +243,19 @@ const Contact = () => {
                   Sending...
                 </>
               ) : (
-                "Commit Changes"
+                <>
+                  <FaPaperPlane />
+                  Send Project Note
+                </>
               )}
             </motion.button>
 
             {responseMsg && (
               <motion.p
-                className={`mt-3 font-medium text-center ${
-                  responseMsg.startsWith("✅")
-                    ? "text-green-400"
-                    : "text-red-400"
+                className={`font-medium text-center sm:col-span-2 ${
+                  responseMsg === "Message sent successfully."
+                    ? "text-emerald-300"
+                    : "text-red-300"
                 }`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -227,32 +267,32 @@ const Contact = () => {
         </GlassCard>
       </motion.div>
 
-      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <GlassCard className="bg-gradient-to-br from-purple-700/20 to-fuchsia-500/10 backdrop-blur-lg">
-            <h3 className="text-xl font-semibold mb-4 text-purple-300">Reach Me</h3>
-            <div className="space-y-3 text-white/80">
+          <GlassCard className="max-w-none border border-emerald-300/15 bg-slate-950/65 backdrop-blur-lg">
+            <h3 className="mb-4 text-xl font-bold text-emerald-200">Direct Channels</h3>
+            <div className="space-y-3 text-slate-300">
               <p className="flex items-center gap-3">
                 <a
                   href="mailto:vinodhkumar142002@gmail.com"
-                  className="flex items-center gap-3 hover:text-purple-400 transition-colors"
+                  className="flex items-center gap-3 transition-colors hover:text-emerald-200"
                   aria-label="Send email"
                 >
-                  <FaEnvelope className="text-purple-400" />
+                  <FaEnvelope className="text-emerald-300" />
                   vinodhkumar142002@gmail.com
                 </a>
               </p>
               <p className="flex items-center gap-3">
                 <a
                   href="tel:+919944438823"
-                  className="flex items-center gap-3 hover:text-purple-400 transition-colors"
+                  className="flex items-center gap-3 transition-colors hover:text-emerald-200"
                   aria-label="Call phone number"
                 >
-                  <FaPhone className="text-purple-400" style={{ transform: "scaleX(-1)" }} />
+                  <FaPhone className="text-emerald-300" style={{ transform: "scaleX(-1)" }} />
                   +91-9944438823
                 </a>
               </p>
@@ -265,10 +305,10 @@ const Contact = () => {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <GlassCard className="bg-gradient-to-br from-cyan-700/20 to-sky-500/10 backdrop-blur-lg">
-            <h3 className="text-xl font-semibold mb-4 text-cyan-300">Socials</h3>
+          <GlassCard className="max-w-none border border-cyan-300/15 bg-slate-950/65 backdrop-blur-lg">
+            <h3 className="mb-4 text-xl font-bold text-cyan-200">Profiles</h3>
             <motion.div
-              className="flex gap-6 text-2xl text-white/80"
+              className="profile-link-grid"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
@@ -280,30 +320,32 @@ const Contact = () => {
                 },
               }}
             >
-              {socialLinks.map(({ href, label, icon: Icon }, index) => (
+              {socialLinks.map(({ href, label, icon: Icon }) => (
                 <motion.a
-                  key={index}
+                  key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
                   title={label}
-                  className="hover:text-cyan-400 transition-colors duration-300"
+                  className="profile-link"
                   variants={{
                     hidden: { opacity: 0, y: 10 },
                     visible: { opacity: 1, y: 0 },
                   }}
-                  whileHover={{ scale: 1.3, rotate: 5 }}
+                  whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Icon />
+                  <Icon aria-hidden="true" />
+                  <span>{label}</span>
+                  <span aria-hidden="true" className="profile-link-arrow">↗</span>
                 </motion.a>
               ))}
             </motion.div>
           </GlassCard>
         </motion.div>
       </div>
-    </div>
+    </section>
   );
 };
 

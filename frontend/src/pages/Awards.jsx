@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import GlassCard from "../components/GlassCard";
+import { FaTimes } from "react-icons/fa";
 
-// 📸 Award images
 import leaderAward from "../assets/leader.jpeg";
-import allRounder from "../assets/all rounder.png";
+import allRounder from "../assets/all-rounder-optimized.jpg";
 import maniMagan from "../assets/mani magan.jpeg";
-import state3 from "../assets/state3.jpg"; // Update path if needed
+import state3 from "../assets/state3.jpg";
 
 const awards = [
   {
@@ -23,28 +22,32 @@ const awards = [
   },
   {
     title: "State III and District I in English Proficiency Test",
-    image: state3, 
-  }
+    image: state3,
+  },
 ];
 
 const Awards = () => {
   const [modalImage, setModalImage] = useState(null);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-16 text-white">
-      {/* 🌈 Gradient Heading with Glow */}
-      <motion.h2
-        className="text-4xl font-extrabold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600"
+    <section className="portfolio-section">
+      <motion.div
+        className="section-heading"
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
       >
-        Awards & Achievements
-      </motion.h2>
+        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">
+          Recognition
+        </p>
+        <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+          Awards and achievements from academics and leadership
+        </h2>
+      </motion.div>
 
-      {/* 🧊 Award Cards Grid */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10"
+        className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -55,83 +58,79 @@ const Awards = () => {
         }}
       >
         {awards.map((award, idx) => (
-          <motion.div
-            key={idx}
+          <motion.article
+            key={award.title}
             variants={{
               hidden: { opacity: 0, y: 40 },
               visible: { opacity: 1, y: 0 },
             }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            whileHover={{ scale: 1.05, rotate: 1 }}
+            whileHover={{ y: -6 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => setModalImage(award)}
+            className="group cursor-pointer overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/65 p-2 shadow-[0_18px_55px_rgba(2,6,23,0.2)] transition-all duration-300 hover:border-cyan-300/45 sm:rounded-[1.5rem] sm:p-3"
           >
-            <GlassCard
-              className="relative flex flex-col items-center text-center gap-6 p-6 border border-white/20
-                         hover:border-cyan-400 hover:shadow-[0_0_30px_5px_rgba(0,255,255,0.4)]
-                         transition-all duration-500 cursor-pointer w-full max-w-[300px] mx-auto
-                         rounded-2xl bg-gradient-to-b from-white/10 to-white/5"
-            >
-              <motion.img
+            <div className="overflow-hidden rounded-[1.1rem] border border-white/10 bg-slate-900">
+              <img
                 src={award.image}
                 alt={award.title}
-                className="w-[240px] h-[240px] object-cover rounded-lg border border-white/30 shadow-lg mb-4"
-                whileHover={{ scale: 1.1, rotate: 2 }}
-                transition={{ duration: 0.4 }}
-                onClick={() => setModalImage(award)}
+                className="h-32 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-44 lg:h-48"
+                draggable={false}
+                loading="lazy"
+                decoding="async"
               />
-              <h3 className="text-xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600 drop-shadow-[0_2px_8px_rgba(0,255,255,0.6)]">
+            </div>
+            <div className="p-2 text-center sm:p-3">
+              <h3 className="text-sm font-black leading-snug text-white sm:text-lg">
                 {award.title}
               </h3>
-            </GlassCard>
-          </motion.div>
+            </div>
+          </motion.article>
         ))}
       </motion.div>
 
-      {/* 🖼️ Modal with Enhanced Award Display */}
       <AnimatePresence>
         {modalImage && (
           <motion.div
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/82 p-4 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setModalImage(null)}
           >
             <motion.div
-              className="relative p-4 rounded-xl"
+              className="relative max-w-4xl rounded-[1.5rem] border border-cyan-300/25 bg-slate-950 p-4 shadow-[0_30px_120px_rgba(8,145,178,0.24)]"
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              onClick={(e) => e.stopPropagation()} // Prevent modal close on inner click
+              onClick={(e) => e.stopPropagation()}
             >
               <motion.img
                 src={modalImage.image}
                 alt={modalImage.title}
-                className="max-w-[90vw] max-h-[80vh] object-contain rounded-xl border-4 border-cyan-400 shadow-xl"
+                className="max-h-[78vh] max-w-[90vw] rounded-xl object-contain"
+                loading="lazy"
+                decoding="async"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 20, opacity: 0 }}
                 transition={{ duration: 0.4 }}
               />
-
-              {/* Award title below image */}
-              <p className="text-center text-lg font-semibold text-cyan-300 mt-4">
+              <p className="mt-4 text-center text-lg font-semibold text-cyan-200">
                 {modalImage.title}
               </p>
-
-              {/* Close button */}
               <button
                 onClick={() => setModalImage(null)}
-                className="absolute top-2 right-2 text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md text-sm"
+                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-slate-950/80 text-white transition hover:border-red-300/50"
                 aria-label="Close modal"
               >
-                ✕
+                <FaTimes />
               </button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </section>
   );
 };
 

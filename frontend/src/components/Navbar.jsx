@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaMoon, FaSun, FaTimes } from "react-icons/fa";
 
 const sections = [
   { id: "home", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "skills", label: "Skills" },
+  { id: "about", label: "Services" },
+  { id: "skills", label: "Capabilities" },
   { id: "experience", label: "Experience" },
+  { id: "projects", label: "Proof" },
+  { id: "instructor", label: "Teaching" },
   { id: "education", label: "Education" },
-  { id: "projects", label: "Projects" },
   { id: "certifications", label: "Certifications" },
   { id: "awards", label: "Awards" },
   { id: "contact", label: "Contact" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ theme, onToggleTheme }) => {
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -45,7 +46,7 @@ const Navbar = () => {
   // Reset overflow and close mobile menu on desktop resize
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1280) {
         document.body.style.overflow = "auto";
         setMenuOpen(false);
       }
@@ -57,56 +58,58 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="fixed top-0 w-full z-50 backdrop-blur-lg bg-black/60 border-b border-cyan-600/30 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center select-none">
+    <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/78 shadow-[0_16px_50px_rgba(2,6,23,0.45)] backdrop-blur-xl">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 select-none">
         {/* Brand */}
-        <span className="text-cyan-400 text-xl font-extrabold tracking-wide font-sans">
-          Vinodh Kumar
+        <span className="flex min-w-0 items-center gap-3 font-sans text-sm font-black tracking-wide text-cyan-100 sm:text-lg">
+          <span className="h-3 w-3 shrink-0 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.95)]" />
+          <span className="sm:hidden">VINODH</span>
+          <span className="hidden sm:inline 2xl:hidden">VINODH KUMAR R</span>
+          <span className="hidden 2xl:inline">VINODH KUMAR R / AWS CLOUD & AI ENGINEER</span>
         </span>
 
         {/* Desktop navigation */}
-        <div className="hidden md:flex gap-6">
+        <div className="hidden xl:flex gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
           {sections.map(({ id, label }) => (
             <a
               key={id}
               href={`#${id}`}
-              className="relative text-white font-medium tracking-wide transition-colors duration-300 hover:text-cyan-400 py-1"
+              className={`rounded-full px-2.5 py-1.5 text-sm font-semibold tracking-wide transition-colors duration-300 ${
+                activeSection === id
+                  ? "bg-cyan-300 text-slate-950"
+                  : "text-slate-300 hover:text-cyan-200"
+              }`}
             >
-              <span
-                className={`relative z-10 ${
-                  activeSection === id ? "text-cyan-400 font-semibold" : ""
-                }`}
-              >
-                {label}
-              </span>
-              <span
-                className={`absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400 rounded scale-x-0 origin-left transition-transform duration-300 ${
-                  activeSection === id ? "scale-x-100" : ""
-                }`}
-              />
+              {label}
             </a>
           ))}
         </div>
 
-        {/* Hamburger icon for mobile */}
-        <div
-          className="md:hidden text-2xl text-cyan-400 z-50 cursor-pointer hover:text-cyan-300 transition-colors duration-200"
-          onClick={() => setMenuOpen(true)}
-          aria-label="Open menu"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") setMenuOpen(true);
-          }}
-        >
-          <FaBars />
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="theme-toggle flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-cyan-100 transition-colors hover:border-cyan-300/50"
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+          >
+            {theme === "dark" ? <FaSun /> : <FaMoon />}
+          </button>
+          <button
+            type="button"
+            className="xl:hidden text-2xl text-cyan-400 z-50 cursor-pointer hover:text-cyan-300 transition-colors duration-200"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+          >
+            <FaBars />
+          </button>
         </div>
       </div>
 
       {/* Backdrop overlay when menu is open */}
       {menuOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-3xl z-40"
+          className="fixed inset-0 z-[80] bg-black/75 backdrop-blur-2xl xl:hidden"
           onClick={() => setMenuOpen(false)}
           aria-label="Close menu overlay"
           role="button"
@@ -119,16 +122,19 @@ const Navbar = () => {
 
       {/* Mobile Drawer with subtle gradient */}
       <div
-        className={`md:hidden fixed top-0 right-0 w-3/5 max-w-xs h-full 
-          bg-gradient-to-b from-cyan-900 to-blue-900 border-l-2 border-cyan-400
-          shadow-lg z-50 transform transition-transform duration-300
+        className={`fixed right-0 top-0 z-[90] h-dvh w-[82vw] max-w-sm overflow-y-auto
+          border-l border-cyan-300/30 bg-slate-950 shadow-[0_0_80px_rgba(8,145,178,0.28)]
+          transform transition-transform duration-300 xl:hidden
           ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
         aria-modal="true"
         role="dialog"
         aria-label="Mobile navigation menu"
       >
         {/* Close icon */}
-        <div className="flex justify-end px-4 pt-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-slate-950/95 px-5 py-4 backdrop-blur-xl">
+          <span className="text-sm font-black tracking-[0.18em] text-cyan-100">
+            MENU
+          </span>
           <FaTimes
             className="text-cyan-400 text-2xl cursor-pointer hover:text-cyan-300 transition-colors duration-200"
             onClick={() => setMenuOpen(false)}
@@ -142,16 +148,16 @@ const Navbar = () => {
         </div>
 
         {/* Nav links */}
-        <ul className="flex flex-col items-start pl-6 pt-6 gap-4 text-base font-medium text-white">
+        <ul className="flex flex-col gap-2 p-5 text-base font-medium text-white">
           {sections.map(({ id, label }) => (
-            <li key={id}>
+            <li key={id} className="w-full">
               <a
                 href={`#${id}`}
                 onClick={() => setMenuOpen(false)}
-                className={`block px-2 py-1 rounded cursor-pointer transition-colors duration-200 ${
+                className={`block w-full rounded-2xl border px-4 py-3 transition-colors duration-200 ${
                   activeSection === id
-                    ? "text-cyan-400 font-semibold"
-                    : "hover:text-cyan-400"
+                    ? "border-cyan-300/40 bg-cyan-300/10 text-cyan-100"
+                    : "border-white/10 bg-white/[0.04] text-slate-200 hover:border-cyan-300/30 hover:text-cyan-100"
                 }`}
               >
                 {label}
