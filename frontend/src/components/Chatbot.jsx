@@ -19,6 +19,8 @@ const starterPrompts = [
   "Which certifications support his profile?",
 ];
 
+const chatbotApiUrl = process.env.REACT_APP_CHATBOT_API_URL || "http://localhost:5001/api/chatbot";
+
 const renderInline = (text) =>
   text.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
     part.startsWith("**") && part.endsWith("**")
@@ -191,7 +193,7 @@ const Chatbot = () => {
     setHasNewReply(false);
 
     try {
-      const response = await fetch("http://localhost:5001/api/chatbot", {
+      const response = await fetch(chatbotApiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, sessionId: getChatSessionId() }),

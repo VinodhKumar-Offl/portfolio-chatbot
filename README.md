@@ -63,6 +63,12 @@ PORT=5001
 
 The backend loads the current resume and canonical profile knowledge base, then sends questions and context to Gemini. An earlier portfolio chatbot used AWS Lex and Amazon Bedrock; the enterprise Bedrock RAG work described in the portfolio is separate Deloitte experience.
 
+### Render backend and Netlify frontend
+
+Create a Render Node web service from the repository root (leave Root Directory blank). Set Build Command to `cd backend && npm ci --legacy-peer-deps` and Start Command to `cd backend && npm start`. The backend lockfile requires `--legacy-peer-deps` with npm 11 because of a LangChain peer dependency conflict. Add `GOOGLE_API_KEY` as a secret environment variable and set `GEMINI_MODEL` to the Gemini model available to that key. Render supplies `PORT` automatically. The service health endpoint is `/health`.
+
+The frontend reads `REACT_APP_CHATBOT_API_URL` from `frontend/.env.production` when Netlify builds it and from `frontend/.env.development` during local development. Production uses `https://portfolio-chatbot-updated.onrender.com/api/chatbot`; local development uses `http://localhost:5001/api/chatbot`. If a Netlify environment variable with the same name is set, keep its value aligned with the production URL before rebuilding.
+
 ## Build
 
 ```bash
